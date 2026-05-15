@@ -24,6 +24,9 @@ export default function RolePrediction({ predictedRole, selectedRole }) {
       <div className="confidence-track" aria-label={`Model confidence ${confidence}%`}>
         <span style={{ width: `${confidence}%` }} />
       </div>
+      {predictedRole.warning ? (
+        <p className="prediction-warning">{predictedRole.warning}</p>
+      ) : null}
     </section>
   );
 }

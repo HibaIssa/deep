@@ -12,8 +12,9 @@ def build_resume_report(file_path, selected_role: str | None = None) -> dict:
     raw_text = extract_resume_text(file_path)
     preprocessing = preprocess_resume_text(raw_text)
     predicted_role = predict_job_role(preprocessing.processed_text)
-    target_role = _resolve_target_role(selected_role, predicted_role)
     extracted_skills = extract_skills(preprocessing.processed_text, raw_text)
+    predicted_role = _flag_low_evidence_prediction(predicted_role, extracted_skills)
+    target_role = _resolve_target_role(selected_role, predicted_role)
     gap_analysis = detect_skill_gaps(extracted_skills, target_role, raw_text)
     raw_text_preview = preview_text(raw_text, 900)
     gap_analysis = refine_gap_analysis_with_llm(
@@ -57,3 +58,18 @@ def _resolve_target_role(selected_role: str | None, predicted_role: dict) -> str
         return model_role
 
     return available_roles[0]
+
+
+def _flag_low_evidence_prediction(predicted_role: dict, extracted_skills: list[dict]) -> dict:
+    if predicted_role.get("role") == "Unknown":
+        return predicted_role
+
+    if extracted_skills:
+        return predicted_role
+
+    flagged_prediction = dict(predicted_role)
+    flagged_prediction["warning"] = (
+        "No supported technical skills were detected, so this resume may be outside the classifier's tech-role labels."
+    )
+    flagged_prediction["low_evidence"] = True
+    return flagged_prediction
