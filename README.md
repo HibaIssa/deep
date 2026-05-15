@@ -6,7 +6,7 @@ This project follows the resume analysis pipeline:
 2. Resume text is extracted and preprocessed.
 3. A role classification model predicts a job role.
 4. Skills are extracted from the resume.
-5. Missing skills are detected using a role skill ontology.
+5. Skill gaps are detected using a role skill ontology, weighted coverage, alternative stacks, inferred evidence, and partial transferable matches.
 6. A recommendation layer generates personalized advice from the predicted role and skill gaps.
 7. A final report combines role prediction, skill gaps, and advice.
 
@@ -19,8 +19,8 @@ Implemented pieces:
 - Resume upload and file validation
 - PDF, DOCX, and TXT text extraction
 - Resume cleaning, tokenization, and preprocessing statistics
-- Skill extraction using keyword matching, TF-IDF style weighting, and alias-based semantic matching
-- Skill gap detection against a role skill ontology
+- Skill extraction using keyword matching, conservative TF-IDF style weighting, and nearby alias matching
+- Skill gap detection with role-aware alternatives, inferred matches, partial transferable evidence, readiness levels, and prioritized gaps
 - Recommendation generation for missing skills and resume improvements
 - React frontend for upload, target role selection, and final report display
 - DistilBERT resume job-category classification from `backend/app/model`

@@ -7,6 +7,12 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+If you are running from the repository root instead of the `backend` directory, use:
+
+```bash
+python -m uvicorn app.main:app --app-dir backend --reload
+```
+
 The first implemented API slice is:
 
 ```http
@@ -32,7 +38,9 @@ Multipart form fields:
 - `file`: resume file, required
 - `selected_role`: role name, optional
 
-This runs every non-model step: parsing, preprocessing, skill extraction, skill gap detection, and recommendation generation.
+This runs every step: parsing, preprocessing, model classification, skill extraction, skill gap detection, and recommendation generation.
+
+Skill gap detection is role-aware rather than a flat checklist. It uses direct matches, aliases, inferred matches, alternative technology groups, partial transferable evidence, weighted coverage, readiness levels, and prioritized gaps.
 
 ## Model inference
 
@@ -72,6 +80,14 @@ python evaluation/evaluate_classifier.py --input evaluation/classifier_labeled_s
 ```
 
 This reports accuracy plus per-class precision, recall, and F1-score.
+
+Skill gap regression tests:
+
+```bash
+python -m unittest discover -s tests
+```
+
+These cover direct matches, inferred matches, alternative stacks, partial transferable evidence, and priority ordering.
 
 Recommendation human-review sheet:
 

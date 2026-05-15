@@ -45,7 +45,10 @@ The LLM prompt should be built from structured pipeline output, not raw resume t
 - The selected target role used for analysis.
 - Matched skills from the resume.
 - Missing skills from the ontology comparison.
-- Coverage percentage and the full required-skill list for the role.
+- Coverage percentage, readiness level, and the full required-skill list for the role.
+- Priority gaps, including whether each gap is fully missing or partially supported by transferable evidence.
+- Match evidence and partial-match evidence when useful for grounding recommendations.
+- Skills waived because an equivalent alternative stack is covered.
 - A short resume preview only if needed for personalization.
 
 The system instruction should constrain the model to act as a career-advice assistant and return concise, evidence-based suggestions. The user payload should be JSON-like structured data, for example:
@@ -60,10 +63,23 @@ User:
 {
   "predicted_role": {"role": "Backend Developer", "confidence": 0.91},
   "target_role": "Backend Developer",
-  "coverage_percent": 68.0,
-  "matched_skills": ["python", "fastapi", "sql"],
-  "missing_skills": ["docker", "ci/cd", "kubernetes"],
-  "required_skills": ["python", "fastapi", "sql", "docker", "ci/cd", "kubernetes"]
+  "coverage_percent": 70.0,
+  "readiness_level": "competitive",
+  "matched_skills": ["python", "fastapi", "sql", "api design", "databases", "testing"],
+  "missing_skills": ["authentication", "microservices", "system design"],
+  "required_skills": ["python", "node.js", "fastapi", "django", "sql", "api design", "databases", "authentication", "microservices", "docker", "testing", "system design"],
+  "priority_gaps": [
+    {"skill": "authentication", "priority": "Medium", "status": "partial"},
+    {"skill": "microservices", "priority": "Medium", "status": "partial"},
+    {"skill": "system design", "priority": "Medium", "status": "missing"}
+  ],
+  "partial_matches": [
+    {"skill": "authentication", "source": "transferable", "matched_alias": "backend, api design"}
+  ],
+  "waived_skills": [
+    {"skill": "node.js", "reason": "covered_by_alternative"},
+    {"skill": "django", "reason": "covered_by_alternative"}
+  ]
 }
 ```
 
@@ -78,7 +94,7 @@ Recommendation quality is evaluated with a small labeled test set of resumes and
 - Relevance: addresses the selected role and the detected gaps.
 - Grounding: does not invent resume experience or unsupported skills.
 - Specificity: gives concrete next steps, projects, courses, or resume edits.
-- Prioritization: ranks the most important gaps first.
+- Prioritization: ranks high-impact gaps first and treats partial gaps differently from fully missing skills.
 - Format validity: returns the expected JSON structure for the frontend.
 
 For development, these checks can be run manually with representative resumes. The concrete commands and CSV formats are documented in `documentation/evaluation.md`. For a later production version, the same criteria can become an automated rubric plus regression tests that compare LLM output against expected role/gap coverage.

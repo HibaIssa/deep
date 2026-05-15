@@ -34,3 +34,55 @@ Response sections:
 - `recommendations`
 - `preprocessing`
 - `raw_text_preview`
+
+### `gap_analysis`
+
+`gap_analysis` contains both the simple fields used by the UI and additional explanation fields:
+
+- `target_role`: role used for the comparison
+- `required_skills`: ontology skills for the role
+- `matched_skills`: skills considered covered by direct, phrase, alias, or inferred evidence
+- `missing_skills`: remaining gaps, ordered by priority instead of raw ontology order
+- `coverage_percent`: weighted readiness score
+- `readiness_level`: one of `early`, `developing`, `competitive`, or `strong`
+- `match_evidence`: evidence for each matched skill, including source and matched alias/context
+- `partial_matches`: transferable evidence that partially supports a missing skill
+- `priority_gaps`: missing or partial gaps with `High`, `Medium`, or `Low` priority
+- `waived_skills`: skills not counted as gaps because an equivalent alternative is covered
+
+Example:
+
+```json
+{
+  "target_role": "Software Engineer",
+  "required_skills": ["data structures", "algorithms", "api design", "git", "testing"],
+  "matched_skills": ["data structures", "algorithms", "api design", "git", "testing"],
+  "missing_skills": ["code review", "debugging", "agile"],
+  "coverage_percent": 79.7,
+  "readiness_level": "competitive",
+  "match_evidence": [
+    {
+      "skill": "api design",
+      "source": "keyword",
+      "score": 1.0,
+      "matched_alias": null
+    }
+  ],
+  "partial_matches": [
+    {
+      "skill": "debugging",
+      "source": "transferable",
+      "score": 0.25,
+      "matched_alias": "api testing, postman, testing"
+    }
+  ],
+  "priority_gaps": [
+    {
+      "skill": "debugging",
+      "priority": "Medium",
+      "status": "partial"
+    }
+  ],
+  "waived_skills": []
+}
+```
