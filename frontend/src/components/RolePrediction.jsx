@@ -1,5 +1,6 @@
 export default function RolePrediction({ predictedRole, selectedRole }) {
-  const confidence = Math.round(predictedRole.confidence * 100);
+  const confidenceValue = predictedRole.evidence_adjusted_confidence ?? predictedRole.confidence;
+  const confidence = Math.round(confidenceValue * 100);
 
   return (
     <section className="report-section">
@@ -17,7 +18,7 @@ export default function RolePrediction({ predictedRole, selectedRole }) {
           <strong>{selectedRole}</strong>
         </div>
         <div>
-          <span>Confidence</span>
+          <span>{predictedRole.low_evidence ? "Evidence confidence" : "Confidence"}</span>
           <strong>{confidence}%</strong>
         </div>
       </div>
@@ -25,7 +26,10 @@ export default function RolePrediction({ predictedRole, selectedRole }) {
         <span style={{ width: `${confidence}%` }} />
       </div>
       {predictedRole.warning ? (
-        <p className="prediction-warning">{predictedRole.warning}</p>
+        <p className="prediction-warning">
+          {predictedRole.warning}
+          {predictedRole.confidence_note ? ` ${predictedRole.confidence_note}` : ""}
+        </p>
       ) : null}
     </section>
   );
