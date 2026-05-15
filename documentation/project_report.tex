@@ -1,0 +1,672 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{float}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!8},
+    columns=fullflexible
+}
+
+\title{\textbf{Resume Career Advisor}\\
+\large AI-Based Resume Analysis and Career Recommendation System}
+\author{
+    Student Name(s): \underline{\hspace{7cm}}\\
+    Course: \underline{\hspace{7cm}}\\
+    Instructor: \underline{\hspace{7cm}}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Abstract}
+
+This report describes the implemented parts of the Resume Career Advisor project. The system is designed to analyze a user's resume, extract relevant information, detect skill gaps for a selected job role, and generate an improvement report. The currently implemented work focuses on the full application pipeline around the machine learning model: resume upload, file validation, text extraction, preprocessing, skill extraction, skill gap detection, recommendation generation, backend API design, frontend dashboard design, user accounts, saved reports, PDF export, automated tests, deployment configuration, documentation, and GitHub repository preparation.
+
+The resume classification model itself is intentionally left as a placeholder because it is being developed separately by another team member. This includes the BERT model, RNN/LSTM model, model training process, and model evaluation. Sections related to dataset preparation, model training, model evaluation, and final machine learning results are included as placeholders so they can be completed once the teammate's implementation is available.
+
+\section{Introduction}
+
+Job applicants often struggle to understand how well their resume matches a target role. A resume may contain valuable experience, but missing keywords, unclear skills, or weak role alignment can reduce its effectiveness. The Resume Career Advisor project addresses this problem by providing an automated resume analysis system that helps users understand their strengths, missing skills, and possible improvements.
+
+The intended complete pipeline is:
+
+\begin{enumerate}
+    \item User uploads a resume.
+    \item Resume text is extracted and preprocessed.
+    \item A classification model predicts the most suitable job role.
+    \item Skills are extracted from the resume.
+    \item Extracted skills are compared with a role-based skill ontology.
+    \item Missing skills are identified.
+    \item Recommendations are generated.
+    \item A final report is displayed to the user.
+\end{enumerate}
+
+In the current implementation, all non-model application components have been completed. The classification model integration point is prepared, but the actual BERT and RNN/LSTM models are teammate-owned components and are not implemented in this application code yet.
+
+\section{Project Objectives}
+
+The main objective of the project is to build a user-facing system that helps users evaluate their resume against a career target. The implemented objectives are:
+
+\begin{itemize}
+    \item Allow users to upload resumes in PDF, DOCX, or TXT format.
+    \item Extract readable text from uploaded resumes.
+    \item Clean and tokenize resume text.
+    \item Extract technical and professional skills from the resume.
+    \item Compare extracted skills with the required skills for a selected job role.
+    \item Detect missing skills and calculate a role coverage score.
+    \item Generate user-oriented improvement recommendations.
+    \item Display results in a responsive frontend dashboard.
+    \item Allow users to register, log in, and save generated reports.
+    \item Export final analysis reports as PDF files.
+    \item Provide automated backend and frontend tests.
+    \item Provide Docker-based deployment configuration.
+    \item Prepare the project structure for future model integration.
+\end{itemize}
+
+The model-related objectives, including BERT fine-tuning, RNN/LSTM comparison, training, and evaluation, are reserved for the teammate responsible for the model.
+
+\section{System Overview}
+
+The project is organized as a full-stack web application. The backend is implemented using FastAPI, while the frontend is implemented using React and Vite. The backend handles resume parsing, preprocessing, skill extraction, gap detection, and report generation. The frontend provides a clean dashboard where users can upload a resume, select a target role, and view the analysis results visually.
+
+\subsection{Repository Structure}
+
+The implemented repository follows this structure:
+
+\begin{lstlisting}
+resume-career-advisor/
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── schemas.py
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── data/
+│   │   ├── uploads/
+│   │   └── utils/
+│   ├── requirements.txt
+│   └── README.md
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── README.md
+├── documentation/
+│   ├── api.md
+│   ├── architecture.md
+│   ├── model_handoff.md
+│   ├── presentation_outline.md
+│   └── project_report.tex
+└── README.md
+\end{lstlisting}
+
+\section{Architecture}
+
+The implemented system follows a modular architecture. Each major step in the resume analysis pipeline is separated into a service module. This improves maintainability and allows the classification model to be added later without changing the rest of the system.
+
+\subsection{Implemented Pipeline}
+
+\begin{lstlisting}
+User uploads resume
+  -> Resume parser extracts text from PDF/DOCX/TXT
+  -> Preprocessing cleans and tokenizes text
+  -> Classification boundary calls model placeholder
+  -> Skill extraction finds resume skills
+  -> Gap detection compares skills with ontology
+  -> Recommendation module creates improvement advice
+  -> Final report is returned to frontend
+\end{lstlisting}
+
+\subsection{Backend Architecture}
+
+The backend is implemented with FastAPI. The main backend files are:
+
+\begin{longtable}{p{0.32\textwidth} p{0.58\textwidth}}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+\texttt{main.py} & Creates the FastAPI application, configures CORS, and registers API routes. \\
+\texttt{config.py} & Stores project paths, upload directory, allowed extensions, and maximum upload size. \\
+\texttt{routes/resume\_routes.py} & Provides a resume upload endpoint for parsing and preprocessing. \\
+\texttt{routes/report\_routes.py} & Provides role listing and full report generation endpoints. \\
+\texttt{services/resume\_parser.py} & Extracts text from PDF, DOCX, and TXT resumes. \\
+\texttt{services/preprocessing.py} & Cleans text, tokenizes text, removes stop words, and returns statistics. \\
+\texttt{services/classification.py} & Contains the placeholder function for future model inference. \\
+\texttt{services/skill\_extraction.py} & Extracts skills using keyword matching, TF-IDF-like scoring, and alias-based semantic matching. \\
+\texttt{services/gap\_detection.py} & Compares extracted skills against required role skills. \\
+\texttt{services/llm\_recommendation.py} & Generates recommendation text based on skill gaps. \\
+\texttt{services/report\_builder.py} & Orchestrates the full non-model report pipeline. \\
+\texttt{schemas.py} & Defines response schemas for report outputs. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Frontend Architecture}
+
+The frontend is implemented using React. It provides a responsive interface for resume upload, role selection, and visual report display.
+
+\begin{longtable}{p{0.32\textwidth} p{0.58\textwidth}}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+\texttt{pages/Home.jsx} & Main page containing the dashboard introduction and upload/report workflow. \\
+\texttt{components/UploadResume.jsx} & Handles file selection, role selection, API calls, and report rendering. \\
+\texttt{components/FinalReport.jsx} & Displays the user-facing summary, match score, insights, and recommendations. \\
+\texttt{components/RolePrediction.jsx} & Displays the model prediction placeholder and selected role. \\
+\texttt{components/SkillGap.jsx} & Displays skill coverage graphs, matched skills, missing skills, and extracted skill confidence bars. \\
+\texttt{services/api.js} & Contains frontend API functions for roles, upload, and report generation. \\
+\texttt{styles.css} & Contains the responsive dashboard styling and graph UI. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Persistence and Authentication}
+
+User accounts and saved reports are implemented using a lightweight SQLite database. The backend supports registration, login, authentication tokens, report saving, report listing, report retrieval, and report deletion. Passwords are not stored directly; they are hashed with PBKDF2 and a unique salt.
+
+\section{Implemented Backend Components}
+
+\subsection{Resume Upload and File Validation}
+
+The backend supports resume uploads through multipart form data. The implemented validation checks:
+
+\begin{itemize}
+    \item The uploaded file has a filename.
+    \item The file extension is supported.
+    \item The file size does not exceed 5 MB.
+\end{itemize}
+
+Supported file extensions are:
+
+\begin{itemize}
+    \item \texttt{.pdf}
+    \item \texttt{.docx}
+    \item \texttt{.txt}
+\end{itemize}
+
+Uploaded files are saved in the backend upload directory using a safe filename and a unique suffix. This reduces filename conflicts and avoids unsafe characters.
+
+\subsection{Resume Text Extraction}
+
+Text extraction is implemented in \texttt{resume\_parser.py}. The extraction method depends on the file type:
+
+\begin{itemize}
+    \item TXT files are read directly using UTF-8 with error ignoring.
+    \item PDF files are parsed using \texttt{pypdf}.
+    \item DOCX files are parsed using \texttt{python-docx}.
+\end{itemize}
+
+If no readable text is found in a PDF or DOCX resume, the backend returns an error explaining that the resume could not be processed.
+
+\subsection{Resume Preprocessing}
+
+The preprocessing module performs:
+
+\begin{itemize}
+    \item Lowercasing.
+    \item URL removal.
+    \item Email removal.
+    \item Phone number removal.
+    \item Removal of unsupported symbols.
+    \item Whitespace normalization.
+    \item Tokenization.
+    \item Stop-word filtering.
+\end{itemize}
+
+The preprocessing output includes:
+
+\begin{itemize}
+    \item Processed text.
+    \item Token list.
+    \item Raw character count.
+    \item Cleaned character count.
+    \item Token count.
+    \item Unique token count.
+\end{itemize}
+
+\section{Skill Extraction}
+
+Skill extraction is implemented without depending on the unavailable machine learning model. The current system uses a practical hybrid approach:
+
+\begin{enumerate}
+    \item Keyword matching.
+    \item TF-IDF-like term scoring.
+    \item Alias-based semantic matching.
+\end{enumerate}
+
+\subsection{Keyword Matching}
+
+The system checks whether known skills or their aliases appear in the resume text. For example, \texttt{postgresql}, \texttt{mysql}, and \texttt{sqlite} can contribute to detecting SQL-related database knowledge.
+
+\subsection{TF-IDF-Like Scoring}
+
+For skills that are not detected through direct phrase matching, the system uses a lightweight TF-IDF-like score. This helps detect skills whose individual terms appear in the resume even if the exact phrase does not appear.
+
+\subsection{Alias-Based Semantic Matching}
+
+The system includes a small manually defined alias dictionary. For example:
+
+\begin{itemize}
+    \item \texttt{javascript}: \texttt{js}, \texttt{javascript}
+    \item \texttt{react}: \texttt{react}, \texttt{react.js}, \texttt{reactjs}
+    \item \texttt{machine learning}: \texttt{machine learning}, \texttt{ml}
+    \item \texttt{fastapi}: \texttt{fastapi}, \texttt{fast api}
+\end{itemize}
+
+This allows the system to match common variations of skill names.
+
+\section{Skill Gap Detection}
+
+Skill gap detection compares the extracted resume skills with a role-based skill ontology stored in \texttt{skills\_ontology.json}. Each role has a list of required skills.
+
+Implemented roles include:
+
+\begin{itemize}
+    \item Data Scientist
+    \item Software Engineer
+    \item Machine Learning Engineer
+    \item Backend Developer
+    \item Frontend Developer
+    \item Data Analyst
+    \item DevOps Engineer
+    \item Cybersecurity Analyst
+    \item Mobile Developer
+    \item Product Manager
+\end{itemize}
+
+For a selected role, the system returns:
+
+\begin{itemize}
+    \item Required skills.
+    \item Matched skills.
+    \item Missing skills.
+    \item Coverage percentage.
+\end{itemize}
+
+The coverage percentage is calculated as:
+
+\[
+\text{Coverage} = \frac{\text{Number of Matched Skills}}{\text{Number of Required Skills}} \times 100
+\]
+
+\section{Recommendation Generation}
+
+The recommendation module generates user-oriented advice based on the detected gaps and matched skills. The current implementation does not call an external LLM API. Instead, it uses structured rule-based text generation so the system can run locally and reliably.
+
+The generated recommendations include:
+
+\begin{itemize}
+    \item High-priority suggestions for missing skills.
+    \item Suggestions for making existing strengths more visible.
+    \item Advice for adding a targeted resume summary.
+\end{itemize}
+
+This module is named \texttt{llm\_recommendation.py} so that a teammate's real LLM-based recommendation component can later be integrated without changing the rest of the pipeline.
+
+\section{API Design}
+
+\subsection{Health Check}
+
+\begin{lstlisting}
+GET /
+\end{lstlisting}
+
+Returns a simple message confirming that the API is running.
+
+\subsection{Resume Upload Endpoint}
+
+\begin{lstlisting}
+POST /api/resume/upload
+\end{lstlisting}
+
+This endpoint uploads a resume and returns preprocessing results. It is useful for testing the parsing and preprocessing pipeline independently.
+
+\subsection{Role List Endpoint}
+
+\begin{lstlisting}
+GET /api/report/roles
+\end{lstlisting}
+
+Returns the available roles from the skill ontology.
+
+\subsection{Report Generation Endpoint}
+
+\begin{lstlisting}
+POST /api/report/generate
+\end{lstlisting}
+
+Multipart form fields:
+
+\begin{itemize}
+    \item \texttt{file}: The uploaded resume file.
+    \item \texttt{selected\_role}: Optional selected role from the frontend.
+\end{itemize}
+
+The response contains:
+
+\begin{itemize}
+    \item Predicted role placeholder.
+    \item Selected role.
+    \item Extracted skills.
+    \item Gap analysis.
+    \item Recommendations.
+    \item Preprocessing output.
+    \item Raw text preview.
+\end{itemize}
+
+\subsection{Authentication Endpoints}
+
+\begin{lstlisting}
+POST /api/auth/register
+POST /api/auth/login
+\end{lstlisting}
+
+These endpoints allow a user to create an account and log in. A successful response returns an authentication token that can be used to save and retrieve reports.
+
+\subsection{Saved Report Endpoints}
+
+\begin{lstlisting}
+POST /api/report/saved
+GET /api/report/saved
+GET /api/report/saved/{report_id}
+DELETE /api/report/saved/{report_id}
+\end{lstlisting}
+
+These endpoints allow authenticated users to save generated reports, view a list of saved reports, reopen a saved report, and delete a saved report.
+
+\subsection{PDF Export Endpoint}
+
+\begin{lstlisting}
+POST /api/report/export-pdf
+\end{lstlisting}
+
+This endpoint accepts a generated report and returns a downloadable PDF file containing the target role, coverage score, matched skills, missing skills, extracted skills, and recommendations.
+
+\section{Frontend Implementation}
+
+The frontend is designed as a user-oriented resume analysis dashboard. The user can upload a resume, choose a target role, and generate a visual report.
+
+\subsection{User Workflow}
+
+\begin{enumerate}
+    \item The user opens the web application.
+    \item The user selects a resume file.
+    \item The user selects a target role.
+    \item The user clicks ``Generate report''.
+    \item The frontend sends the resume and role to the backend.
+    \item The backend returns the generated report.
+    \item The frontend displays visual results and recommendations.
+\end{enumerate}
+
+\subsection{Dashboard Design}
+
+The frontend includes:
+
+\begin{itemize}
+    \item A branded top bar.
+    \item A clear project introduction.
+    \item Pipeline badges showing upload, extract, match, and report.
+    \item A polished upload panel.
+    \item A target role selector.
+    \item A responsive final report panel.
+    \item Login and registration controls.
+    \item Saved report access.
+    \item PDF export controls.
+\end{itemize}
+
+\subsection{Visual Report Components}
+
+The report UI includes visual elements to make the output easier for users to understand:
+
+\begin{itemize}
+    \item Career fit score donut chart.
+    \item Readiness message.
+    \item Insight cards for target role, matched skills, missing skills, and next step.
+    \item Matched-versus-missing stacked bar chart.
+    \item Readiness breakdown bar chart.
+    \item Skill confidence bars.
+    \item Numbered recommendation cards.
+    \item Save and PDF download buttons.
+\end{itemize}
+
+The design is responsive and adapts to desktop, tablet, and mobile screen sizes.
+
+\section{Testing and Verification}
+
+The implemented parts were verified using command-line checks and build commands.
+
+\subsection{Backend Verification}
+
+The backend was checked using Python compilation:
+
+\begin{lstlisting}
+python -m compileall backend/app
+\end{lstlisting}
+
+The report endpoint was also tested using FastAPI's \texttt{TestClient}. A sample TXT resume was uploaded to confirm that the report endpoint returns a successful response and produces role coverage, recommendations, and extracted skills.
+
+\subsection{Frontend Verification}
+
+The frontend was verified using a production build:
+
+\begin{lstlisting}
+npm.cmd run build
+\end{lstlisting}
+
+The build completed successfully, confirming that the React components and CSS were valid.
+
+The frontend also includes an automated component test for the final report dashboard:
+
+\begin{lstlisting}
+npm.cmd test
+\end{lstlisting}
+
+The test verifies that the report summary, target role, and recommendation content render correctly.
+
+\subsection{Local Server Verification}
+
+The local frontend and backend were verified at:
+
+\begin{itemize}
+    \item Frontend: \url{http://127.0.0.1:5173/}
+    \item Backend: \url{http://127.0.0.1:8000/}
+\end{itemize}
+
+\section{GitHub Repository}
+
+The project was initialized as a Git repository and pushed to GitHub.
+
+\begin{itemize}
+    \item Repository: \url{https://github.com/HibaIssa/deep}
+    \item Branch: \texttt{main}
+    \item Initial commit message: \texttt{Initial resume career advisor app}
+\end{itemize}
+
+Ignored files include logs, uploads, \texttt{node\_modules}, build output, virtual environments, and environment files.
+
+\section{Deployment Configuration}
+
+Deployment configuration has been added using Docker. The backend includes a Python-based Dockerfile, and the frontend includes a Node build stage followed by an Nginx serving stage. A \texttt{docker-compose.yml} file is included to run both services together.
+
+\begin{lstlisting}
+docker compose up --build
+\end{lstlisting}
+
+The compose setup exposes:
+
+\begin{itemize}
+    \item Backend API on port \texttt{8000}.
+    \item Frontend application on port \texttt{5173}.
+\end{itemize}
+
+\section{Model Integration Placeholder}
+
+\textbf{This section is intentionally left for the teammate implementing the model.}
+
+The current model integration file is:
+
+\begin{lstlisting}
+backend/app/services/classification.py
+\end{lstlisting}
+
+The rest of the application expects the model function to return this format:
+
+\begin{lstlisting}
+{
+    "role": "Backend Developer",
+    "confidence": 0.91,
+    "model": "bert_finetuned"
+}
+\end{lstlisting}
+
+The predicted role should match one of the role names in \texttt{skills\_ontology.json}. If an unknown role is returned, the report endpoint can still use the user-selected role.
+
+\section{Dataset}
+
+\textbf{Placeholder: To be completed when the dataset work is implemented.}
+
+This section should include:
+
+\begin{itemize}
+    \item Dataset source.
+    \item Number of resumes.
+    \item Job role labels.
+    \item Data format.
+    \item Train/validation/test split.
+    \item Data cleaning steps used for model training.
+    \item Any class imbalance handling.
+\end{itemize}
+
+\vspace{2cm}
+\noindent\textit{Add dataset details here.}
+
+\section{Machine Learning Model}
+
+\textbf{Placeholder: To be completed by the teammate implementing the model.}
+
+This section should include:
+
+\begin{itemize}
+    \item BERT fine-tuning approach.
+    \item LSTM architecture.
+    \item Input representation.
+    \item Tokenization method for each model.
+    \item Hyperparameters.
+    \item Model selection criteria.
+\end{itemize}
+
+\vspace{2cm}
+\noindent\textit{Add model details here.}
+
+\section{Training Process}
+
+\textbf{Placeholder: To be completed when training is implemented.}
+
+This section should include:
+
+\begin{itemize}
+    \item Training environment.
+    \item Libraries and frameworks.
+    \item Number of epochs.
+    \item Batch size.
+    \item Optimizer.
+    \item Learning rate.
+    \item Loss function.
+    \item Training time.
+\end{itemize}
+
+\vspace{2cm}
+\noindent\textit{Add training process details here.}
+
+\section{Results}
+
+\textbf{Placeholder: To be completed after model evaluation.}
+
+This section should include tables and figures for:
+
+\begin{itemize}
+    \item BERT performance.
+    \item LSTM performance.
+    \item Comparison between models.
+    \item Final selected model.
+    \item Example predictions.
+\end{itemize}
+
+\vspace{2cm}
+\noindent\textit{Add results here.}
+
+\section{Evaluation}
+
+\textbf{Placeholder: To be completed after the evaluation work is implemented.}
+
+This section should include:
+
+\begin{itemize}
+    \item Accuracy.
+    \item Precision.
+    \item Recall.
+    \item F1-score.
+    \item Confusion matrix.
+    \item Error analysis.
+\end{itemize}
+
+\vspace{2cm}
+\noindent\textit{Add evaluation details here.}
+
+\section{Limitations}
+
+The current implementation has the following limitations:
+
+\begin{itemize}
+    \item The job role classification model is not yet implemented.
+    \item Recommendation generation is rule-based and does not currently call an external LLM.
+    \item Skill extraction depends on the role ontology and alias dictionary, so very uncommon skills may still require ontology updates.
+\end{itemize}
+
+\section{Pending Team Integration and Future Work}
+
+The following items are not implemented in the current application code. The first two items are expected to be completed by the teammate responsible for the machine learning and advanced recommendation components:
+
+\begin{itemize}
+    \item Integrating the teammate's trained BERT classifier.
+    \item Integrating the teammate's RNN/LSTM comparison model and final selected model.
+    \item Integrating a real LLM-based recommendation module if provided by the teammate.
+    \item Further expanding the skill ontology as more roles and datasets become available.
+\end{itemize}
+
+\section{Conclusion}
+
+The implemented Resume Career Advisor system provides a complete non-model pipeline for resume analysis. Users can upload resumes, select a target role, extract skills, detect gaps, and view a user-friendly visual report with recommendations. The backend is modular and prepared for model integration, while the frontend provides a responsive dashboard suitable for demonstration.
+
+The remaining major work is the teammate-owned machine learning component, including dataset preparation, BERT and RNN/LSTM training, evaluation, and final integration into the existing \texttt{classification.py} service. The current implementation already provides the surrounding application pipeline needed to use that model once it is ready.
+
+\end{document}

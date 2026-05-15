@@ -1,6 +1,21 @@
 from pydantic import BaseModel
 
 
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    username: str
+
+
 class SkillMatch(BaseModel):
     skill: str
     source: str
@@ -30,3 +45,16 @@ class ResumeReport(BaseModel):
     recommendations: list[RecommendationItem]
     preprocessing: dict
     raw_text_preview: str
+
+
+class SavedReportCreate(BaseModel):
+    title: str
+    report: ResumeReport
+
+
+class SavedReportSummary(BaseModel):
+    id: int
+    title: str
+    selected_role: str
+    coverage_percent: float
+    created_at: str

@@ -45,3 +45,73 @@ export async function generateReport(file, selectedRole) {
 
   return payload;
 }
+
+export async function registerUser(username, password) {
+  return authRequest("/api/auth/register", username, password);
+}
+
+export async function loginUser(username, password) {
+  return authRequest("/api/auth/login", username, password);
+}
+
+export async function exportReportPdf(report) {
+  const response = await fetch(`${API_BASE_URL}/api/report/export-pdf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(report),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json();
+    throw new Error(payload.detail || "PDF export failed.");
+  }
+
+  return response.blob();
+}
+
+export async function saveReport(token, title, report) {
+  const response = await fetch(`${API_BASE_URL}/api/report/saved`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ title, report }),
+  });
+
+  return parseJsonResponse(response, "Could not save report.");
+}
+
+export async function fetchSavedReports(token) {
+  const response = await fetch(`${API_BASE_URL}/api/report/saved`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return parseJsonResponse(response, "Could not load saved reports.");
+}
+
+export async function fetchSavedReport(token, reportId) {
+  const response = await fetch(`${API_BASE_URL}/api/report/saved/${reportId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return parseJsonResponse(response, "Could not open saved report.");
+}
+
+async function authRequest(path, username, password) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  return parseJsonResponse(response, "Authentication failed.");
+}
+
+async function parseJsonResponse(response, fallbackMessage) {
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload.detail || fallbackMessage);
+  }
+  return payload;
+}

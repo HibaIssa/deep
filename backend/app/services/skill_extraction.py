@@ -20,6 +20,16 @@ SKILL_ALIASES = {
     "api design": {"api design", "rest api", "restful api"},
     "testing": {"testing", "unit testing", "pytest", "jest"},
     "git": {"git", "github", "gitlab"},
+    "ci/cd": {"ci/cd", "ci", "cd", "continuous integration", "continuous deployment"},
+    "cloud": {"cloud", "aws", "azure", "gcp"},
+    "kubernetes": {"kubernetes", "k8s"},
+    "react native": {"react native", "react-native"},
+    "api integration": {"api integration", "third-party api", "rest integration"},
+    "security monitoring": {"security monitoring", "siem", "soc"},
+    "vulnerability assessment": {"vulnerability assessment", "vulnerability scanning"},
+    "business intelligence": {"business intelligence", "bi"},
+    "stakeholder management": {"stakeholder management", "stakeholders"},
+    "product strategy": {"product strategy", "product vision"},
 }
 
 

@@ -58,5 +58,45 @@
     "power bi",
     "data cleaning",
     "business intelligence"
+  ],
+  "DevOps Engineer": [
+    "linux",
+    "docker",
+    "kubernetes",
+    "cloud",
+    "ci/cd",
+    "terraform",
+    "monitoring",
+    "scripting"
+  ],
+  "Cybersecurity Analyst": [
+    "network security",
+    "risk assessment",
+    "incident response",
+    "linux",
+    "python",
+    "security monitoring",
+    "vulnerability assessment",
+    "compliance"
+  ],
+  "Mobile Developer": [
+    "javascript",
+    "typescript",
+    "react native",
+    "flutter",
+    "mobile ui",
+    "api integration",
+    "testing",
+    "app deployment"
+  ],
+  "Product Manager": [
+    "product strategy",
+    "roadmapping",
+    "user research",
+    "analytics",
+    "stakeholder management",
+    "agile",
+    "prioritization",
+    "communication"
   ]
 }
