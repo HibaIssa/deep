@@ -1,0 +1,62 @@
+{
+  "Data Scientist": [
+    "python",
+    "sql",
+    "statistics",
+    "machine learning",
+    "data visualization",
+    "data cleaning",
+    "pandas",
+    "scikit-learn"
+  ],
+  "Software Engineer": [
+    "data structures",
+    "algorithms",
+    "git",
+    "testing",
+    "system design",
+    "object-oriented programming",
+    "debugging",
+    "api design"
+  ],
+  "Machine Learning Engineer": [
+    "python",
+    "pytorch",
+    "tensorflow",
+    "mlops",
+    "model deployment",
+    "feature engineering",
+    "docker",
+    "cloud"
+  ],
+  "Backend Developer": [
+    "python",
+    "fastapi",
+    "sql",
+    "api design",
+    "databases",
+    "docker",
+    "authentication",
+    "testing"
+  ],
+  "Frontend Developer": [
+    "javascript",
+    "typescript",
+    "react",
+    "css",
+    "html",
+    "accessibility",
+    "state management",
+    "testing"
+  ],
+  "Data Analyst": [
+    "sql",
+    "excel",
+    "statistics",
+    "data visualization",
+    "tableau",
+    "power bi",
+    "data cleaning",
+    "business intelligence"
+  ]
+}
