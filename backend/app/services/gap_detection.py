@@ -46,7 +46,8 @@ ROLE_ALTERNATIVE_GROUPS = {
 
 
 INFERRED_SKILL_RULES = {
-    "api design": {"fastapi", "django", "node.js", "rest api", "api integration"},
+    "api design": {"fastapi", "django", "node.js", "rest api"},
+    "backend integration": {"mobile backend integration", "rest api", "api design", "backend", "data retrieval"},
     "databases": {"sql", "postgresql", "mysql", "database design"},
     "testing": {"pytest", "jest", "selenium", "cypress", "test automation", "api testing"},
     "cloud": {"aws", "azure", "gcp"},
@@ -105,6 +106,11 @@ ROLE_IMPORTANCE = {
         "important": {"scikit-learn", "feature engineering", "model deployment", "mlops", "docker", "cloud"},
         "supporting": {"llm"},
     },
+    "Mobile Developer": {
+        "core": {"android", "ios", "react native", "flutter", "swift", "kotlin", "mobile ui"},
+        "important": {"mobile testing", "backend integration", "performance optimization", "offline storage"},
+        "supporting": {"app store deployment"},
+    },
 }
 
 
@@ -123,6 +129,10 @@ PARTIAL_SKILL_RULES = {
     "data cleaning": {"pandas", "numpy"},
     "experimentation": {"statistics", "model evaluation"},
     "mlops": {"model deployment", "docker", "cloud"},
+    "backend integration": {"mobile backend integration", "rest api", "api design", "backend", "data retrieval"},
+    "mobile testing": {"testing", "test automation"},
+    "app store deployment": {"mobile app", "deployment"},
+    "offline storage": {"session management", "local storage", "mobile app"},
 }
 
 
@@ -336,11 +346,39 @@ def _resume_signal_names(resume_text: str) -> set[str]:
     if _contains_phrase(searchable_text, "session management"):
         signals.add("session management")
 
+    if _contains_phrase(searchable_text, "local storage") or _contains_phrase(searchable_text, "offline storage"):
+        signals.add("local storage")
+
     if _contains_phrase(searchable_text, "backend"):
         signals.add("backend")
 
     if _contains_phrase(searchable_text, "frontend"):
         signals.add("frontend")
+
+    if (
+        _contains_phrase(searchable_text, "mobile app")
+        or _contains_phrase(searchable_text, "mobile applications")
+        or _contains_phrase(searchable_text, "react native")
+        or _contains_phrase(searchable_text, "flutter")
+    ):
+        signals.add("mobile app")
+
+    if (
+        ("mobile app" in signals or _contains_phrase(searchable_text, "react native"))
+        and (
+            _contains_phrase(searchable_text, "backend apis")
+            or _contains_phrase(searchable_text, "rest api")
+            or _contains_phrase(searchable_text, "data retrieval")
+            or _contains_phrase(searchable_text, "automated workflows")
+            or _contains_phrase(searchable_text, "ordering")
+            or _contains_phrase(searchable_text, "cart")
+            or _contains_phrase(searchable_text, "payments")
+        )
+    ):
+        signals.add("mobile backend integration")
+
+    if _contains_phrase(searchable_text, "data retrieval"):
+        signals.add("data retrieval")
 
     return signals
 

@@ -38,6 +38,7 @@ Gap detection is not a flat keyword checklist. The service starts with the selec
 - directly extracted skills from the resume
 - exact phrase and alias matches
 - inferred skills, such as `api design` from FastAPI/Django/Node.js or `testing` from pytest/Jest/Postman/API testing
+- project-context skills, such as `backend integration` for mobile apps only when the resume shows mobile work connected to backend APIs, data retrieval, workflows, ordering, carts, or payments
 - role-specific alternative groups, such as FastAPI/Django/Node.js for backend frameworks or AWS/Azure/GCP/cloud for cloud coverage
 - partial transferable evidence, such as Git partially supporting code-review readiness or API testing/Postman partially supporting debugging
 

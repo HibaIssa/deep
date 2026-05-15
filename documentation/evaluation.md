@@ -56,6 +56,7 @@ The tests cover:
 - direct skill and alias matches
 - false-positive prevention for broad multi-word skills
 - inferred matches, such as `api design` from backend framework evidence
+- project-context matches, such as mobile `backend integration` from mobile apps connected to backend APIs, data retrieval, ordering, carts, or payments
 - role-specific alternatives, such as FastAPI/Django/Node.js or AWS/Azure/GCP/cloud
 - resume-context signals, such as Computer Science coursework plus Java/C++/Python supporting algorithms and data structures
 - partial transferable matches, such as Git partially supporting code review or Postman/API testing partially supporting debugging

@@ -20,7 +20,7 @@ Implemented pieces:
 - PDF, DOCX, and TXT text extraction
 - Resume cleaning, tokenization, and preprocessing statistics
 - Skill extraction using keyword matching, conservative TF-IDF style weighting, and nearby alias matching
-- Skill gap detection with role-aware alternatives, inferred matches, partial transferable evidence, readiness levels, and prioritized gaps
+- Skill gap detection with role-aware alternatives, inferred matches, project-context evidence, partial transferable evidence, readiness levels, and prioritized gaps
 - Recommendation generation for missing skills and resume improvements
 - React frontend for upload, target role selection, and final report display
 - DistilBERT resume job-category classification from `backend/app/model`

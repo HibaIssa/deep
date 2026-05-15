@@ -40,7 +40,7 @@ Multipart form fields:
 
 This runs every step: parsing, preprocessing, model classification, skill extraction, skill gap detection, and recommendation generation.
 
-Skill gap detection is role-aware rather than a flat checklist. It uses direct matches, aliases, inferred matches, alternative technology groups, partial transferable evidence, weighted coverage, readiness levels, and prioritized gaps.
+Skill gap detection is role-aware rather than a flat checklist. It uses direct matches, aliases, inferred matches, project-context evidence, alternative technology groups, partial transferable evidence, weighted coverage, readiness levels, and prioritized gaps.
 
 ## Model inference
 

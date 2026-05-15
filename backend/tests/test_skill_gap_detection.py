@@ -161,6 +161,31 @@ class SkillGapDetectionTests(unittest.TestCase):
         )
         self.assertGreaterEqual(gap["coverage_percent"], 60.0)
 
+    def test_api_integration_is_not_a_standalone_extracted_skill(self):
+        resume_text = (
+            "Built a React Native restaurant app with voice ordering, automated workflows, "
+            "backend APIs, employee data retrieval, cart, and payments."
+        )
+
+        extracted = extract_skills(resume_text, resume_text)
+        extracted_names = {item["skill"] for item in extracted}
+
+        self.assertNotIn("api integration", extracted_names)
+
+    def test_mobile_backend_integration_is_inferred_from_project_context(self):
+        resume_text = (
+            "Built a React Native mobile app with restaurant ordering, automated workflows, "
+            "backend APIs, employee data retrieval, cart, and payments."
+        )
+
+        gap = self._gap_for(resume_text, "Mobile Developer")
+
+        self.assertIn("react native", gap["matched_skills"])
+        self.assertIn("backend integration", gap["matched_skills"])
+        evidence_by_skill = {item["skill"]: item for item in gap["match_evidence"]}
+        self.assertEqual(evidence_by_skill["backend integration"]["source"], "inferred")
+        self.assertIn("mobile backend integration", evidence_by_skill["backend integration"]["matched_alias"])
+
 
 if __name__ == "__main__":
     unittest.main()
