@@ -25,6 +25,35 @@ class SkillGapDetectionTests(unittest.TestCase):
         self.assertGreaterEqual(gap["coverage_percent"], 80.0)
         self.assertTrue(gap["match_evidence"])
 
+    def test_backend_framework_alternatives_are_not_counted_as_gaps(self):
+        gap = self._gap_for(
+            "Built production APIs using Python, FastAPI, SQL, PostgreSQL, Docker, and pytest.",
+            "Backend Developer",
+        )
+
+        self.assertIn("fastapi", gap["matched_skills"])
+        self.assertNotIn("node.js", gap["matched_skills"])
+        self.assertNotIn("django", gap["matched_skills"])
+        self.assertNotIn("node.js", gap["missing_skills"])
+        self.assertNotIn("django", gap["missing_skills"])
+        self.assertGreaterEqual(gap["coverage_percent"], 60.0)
+        self.assertIn("node.js", {item["skill"] for item in gap["waived_skills"]})
+        self.assertIn("django", {item["skill"] for item in gap["waived_skills"]})
+
+    def test_inferred_matches_are_grounded_in_supporting_skills(self):
+        gap = self._gap_for(
+            "Built services with Python, FastAPI, PostgreSQL, Docker, and pytest.",
+            "Backend Developer",
+        )
+
+        self.assertIn("api design", gap["matched_skills"])
+        self.assertIn("databases", gap["matched_skills"])
+        self.assertIn("testing", gap["matched_skills"])
+
+        evidence_by_skill = {item["skill"]: item for item in gap["match_evidence"]}
+        self.assertEqual(evidence_by_skill["api design"]["source"], "inferred")
+        self.assertIn("fastapi", evidence_by_skill["api design"]["matched_alias"])
+
     def test_extraction_avoids_broad_design_and_testing_false_positives(self):
         extracted = extract_skills(
             "Built APIs with Python, FastAPI, SQL, Docker, pytest testing, and system design."
@@ -93,6 +122,44 @@ class SkillGapDetectionTests(unittest.TestCase):
             "docker",
         ]:
             self.assertIn(skill, gap["matched_skills"])
+
+        self.assertNotIn("azure", gap["missing_skills"])
+
+    def test_software_engineer_resume_uses_project_and_coursework_context(self):
+        resume_text = (
+            "Software Engineer and AI full-stack developer. Built mobile applications using React Native "
+            "and full e-commerce platforms. Designed backend APIs using Node.js, Express, and .NET. "
+            "Built scalable frontend systems using Next.js, React, and Tailwind CSS. "
+            "B.Sc. Computer Science. Projects include a bookstore e-commerce full-stack system, "
+            "a Django-based club management system, fraud detection, and AI assistants. "
+            "Skills: Python, JavaScript, TypeScript, C++, Java, React, Node.js, Django, TensorFlow, "
+            "NumPy, pandas, scikit-learn, Git, AWS, Docker, Postman."
+        )
+
+        extracted = extract_skills(resume_text, resume_text)
+        extracted_names = {item["skill"] for item in extracted}
+        gap = detect_skill_gaps(extracted, "Software Engineer", resume_text)
+
+        self.assertNotIn("mobile ui", extracted_names)
+        self.assertNotIn("web performance", extracted_names)
+
+        for skill in [
+            "data structures",
+            "algorithms",
+            "object-oriented programming",
+            "system design",
+            "api design",
+            "git",
+            "testing",
+            "software architecture",
+        ]:
+            self.assertIn(skill, gap["matched_skills"])
+
+        self.assertEqual(
+            set(gap["missing_skills"]),
+            {"debugging", "design patterns", "code review", "agile"},
+        )
+        self.assertGreaterEqual(gap["coverage_percent"], 60.0)
 
 
 if __name__ == "__main__":

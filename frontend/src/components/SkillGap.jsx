@@ -1,9 +1,12 @@
 export default function SkillGap({ gapAnalysis, extractedSkills }) {
   const matchedCount = gapAnalysis.matched_skills.length;
   const missingCount = gapAnalysis.missing_skills.length;
+  const waivedSkills = gapAnalysis.waived_skills || [];
+  const waivedCount = waivedSkills.length;
   const totalSkills = Math.max(gapAnalysis.required_skills.length, 1);
-  const matchedPercent = Math.round((matchedCount / totalSkills) * 100);
+  const matchedPercent = Math.round(gapAnalysis.coverage_percent);
   const missingPercent = Math.round((missingCount / totalSkills) * 100);
+  const waivedPercent = Math.round((waivedCount / totalSkills) * 100);
 
   return (
     <section className="report-section">
@@ -17,10 +20,12 @@ export default function SkillGap({ gapAnalysis, extractedSkills }) {
           <h3>Required skills coverage</h3>
           <div className="stacked-bar" aria-label={`${matchedPercent}% matched and ${missingPercent}% missing`}>
             <span className="bar-matched" style={{ width: `${matchedPercent}%` }} />
+            {waivedCount > 0 && <span className="bar-waived" style={{ width: `${waivedPercent}%` }} />}
             <span className="bar-missing" style={{ width: `${missingPercent}%` }} />
           </div>
           <div className="chart-legend">
             <span><i className="legend matched" /> Matched {matchedCount}</span>
+            {waivedCount > 0 && <span><i className="legend waived" /> Alternatives {waivedCount}</span>}
             <span><i className="legend missing" /> Missing {missingCount}</span>
           </div>
         </div>
@@ -29,6 +34,7 @@ export default function SkillGap({ gapAnalysis, extractedSkills }) {
           <h3>Readiness breakdown</h3>
           <div className="mini-bars">
             <ChartBar label="Matched" value={matchedPercent} tone="matched" />
+            {waivedCount > 0 && <ChartBar label="Alternatives" value={waivedPercent} tone="waived" />}
             <ChartBar label="Missing" value={missingPercent} tone="missing" />
           </div>
         </div>
@@ -38,6 +44,13 @@ export default function SkillGap({ gapAnalysis, extractedSkills }) {
         <SkillList title="Matched skills" items={gapAnalysis.matched_skills} tone="matched" />
         <SkillList title="Missing skills" items={gapAnalysis.missing_skills} tone="missing" />
       </div>
+      {waivedCount > 0 && (
+        <SkillList
+          title="Covered by alternatives"
+          items={waivedSkills.map((item) => item.skill)}
+          tone="waived"
+        />
+      )}
 
       <div>
         <div className="section-heading compact">

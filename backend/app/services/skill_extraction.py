@@ -189,14 +189,24 @@ def _tf_idf_like_score(skill: str, token_counts: Counter, all_skills: list[str])
 
 
 def _semantic_overlap(skill: str, tokens: list[str]) -> float:
-    skill_terms = set(_tokens(skill))
-    token_set = set(tokens)
-    if not skill_terms:
+    candidate_phrases = {skill, *SKILL_ALIASES.get(skill, set())}
+    return max((_nearby_term_overlap(phrase, tokens) for phrase in candidate_phrases), default=0.0)
+
+
+def _nearby_term_overlap(phrase: str, tokens: list[str]) -> float:
+    phrase_terms = _tokens(phrase)
+    if not phrase_terms:
         return 0.0
-    direct_overlap = len(skill_terms & token_set) / len(skill_terms)
-    alias_overlap = 0.0
-    for alias in SKILL_ALIASES.get(skill, set()):
-        alias_terms = set(_tokens(alias))
-        if alias_terms:
-            alias_overlap = max(alias_overlap, len(alias_terms & token_set) / len(alias_terms))
-    return max(direct_overlap, alias_overlap)
+    if len(phrase_terms) == 1:
+        return 1.0 if phrase_terms[0] in tokens else 0.0
+
+    window_size = min(max(len(phrase_terms) + 3, 4), 7)
+    best_overlap = 0.0
+    for index in range(len(tokens)):
+        window_terms = set(tokens[index : index + window_size])
+        overlap = len(set(phrase_terms) & window_terms) / len(set(phrase_terms))
+        best_overlap = max(best_overlap, overlap)
+        if best_overlap >= 1.0:
+            break
+
+    return best_overlap

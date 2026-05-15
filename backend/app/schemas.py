@@ -14,6 +14,10 @@ class GapAnalysis(BaseModel):
     missing_skills: list[str]
     coverage_percent: float
     match_evidence: list[dict] = Field(default_factory=list)
+    partial_matches: list[dict] = Field(default_factory=list)
+    priority_gaps: list[dict] = Field(default_factory=list)
+    readiness_level: str = "early"
+    waived_skills: list[dict] = Field(default_factory=list)
 
 
 class RecommendationItem(BaseModel):
