@@ -1,9 +1,17 @@
 {
   "roles": [
-    "Data Scientist",
     "Software Engineer",
-    "Machine Learning Engineer",
+    "Frontend Developer",
+    "Database Engineer",
+    "DevOps/Cloud Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Cybersecurity Engineer",
+    "AI/ML Engineer",
+    "Data Engineer",
+    "Full Stack Developer",
     "Backend Developer",
-    "Frontend Developer"
+    "Blockchain Developer",
+    "Mobile Developer"
   ]
 }

@@ -2,25 +2,113 @@ import json
 import math
 import re
 from collections import Counter
-from pathlib import Path
 
 from app.config import DATA_DIR
 
 
 SKILL_ALIASES = {
-    "javascript": {"js", "javascript"},
-    "typescript": {"ts", "typescript"},
-    "react": {"react", "react.js", "reactjs"},
-    "fastapi": {"fastapi", "fast api"},
-    "sql": {"sql", "postgres", "postgresql", "mysql", "sqlite"},
-    "python": {"python", "py"},
-    "machine learning": {"machine learning", "ml"},
-    "data visualization": {"data visualization", "dashboarding", "tableau", "power bi"},
+    "accessibility": {"accessibility", "a11y", "wcag"},
+    "agile": {"agile", "scrum", "kanban"},
+    "algorithms": {"algorithms", "algorithmic"},
+    "api design": {"api design", "rest api", "restful api", "api architecture", "apis"},
+    "api integration": {"api integration", "api integrations", "integrating apis"},
+    "api testing": {"api testing", "postman", "rest api testing"},
+    "application security": {"application security", "appsec"},
+    "authentication": {"authentication", "auth", "oauth", "jwt"},
+    "azure": {"azure", "microsoft azure"},
+    "big data": {"big data", "distributed data"},
+    "blockchain": {"blockchain"},
+    "cloud": {"cloud", "cloud computing"},
+    "code review": {"code review", "code reviews", "pull request review", "pr review"},
+    "data cleaning": {"data cleaning", "data preprocessing", "data wrangling"},
+    "data modeling": {"data modeling", "data modelling"},
+    "data structures": {"data structures", "data structure"},
+    "data visualization": {"data visualization", "dashboarding", "tableau", "power bi", "dashboards"},
+    "database design": {"database design", "schema design"},
+    "database security": {"database security", "db security"},
     "databases": {"database", "databases", "dbms"},
-    "api design": {"api design", "rest api", "restful api"},
-    "testing": {"testing", "unit testing", "pytest", "jest"},
+    "debugging": {"debugging", "debug"},
+    "deep learning": {"deep learning", "dl", "neural networks"},
+    "deployment": {"deployment", "deployments", "deploy"},
+    "design patterns": {"design patterns", "software design patterns"},
+    "django": {"django"},
+    "docker": {"docker", "containerization", "containers"},
+    "etl": {"etl", "elt"},
+    "experimentation": {"experimentation", "a/b testing", "ab testing", "experiments"},
+    "fastapi": {"fastapi", "fast api"},
+    "feature engineering": {"feature engineering"},
+    "flutter": {"flutter"},
+    "html": {"html", "html5"},
+    "incident response": {"incident response", "ir"},
+    "indexing": {"indexing", "database indexing"},
+    "ios": {"ios"},
+    "jest": {"jest"},
+    "javascript": {"js", "javascript"},
+    "kafka": {"kafka", "apache kafka"},
+    "kotlin": {"kotlin"},
+    "linux": {"linux"},
+    "llm": {"llm", "llms", "large language model", "large language models", "generative ai"},
+    "machine learning": {"machine learning", "ml"},
+    "manual testing": {"manual testing"},
+    "microservices": {"microservices", "microservice"},
+    "mlops": {"mlops", "machine learning operations"},
+    "model deployment": {"model deployment", "deploying models"},
+    "model evaluation": {"model evaluation", "model validation"},
+    "monitoring": {"monitoring", "observability"},
+    "mysql": {"mysql"},
+    "network security": {"network security", "network hardening"},
+    "node.js": {"node", "node.js", "nodejs"},
+    "numpy": {"numpy", "num py"},
+    "object-oriented programming": {"object-oriented programming", "object oriented programming", "oop"},
+    "pandas": {"pandas"},
+    "performance optimization": {"performance optimization", "performance tuning"},
+    "postgresql": {"postgres", "postgresql"},
+    "pytorch": {"pytorch", "py torch"},
+    "python": {"python", "py"},
+    "pytest": {"pytest"},
+    "query optimization": {"query optimization", "query tuning"},
+    "react": {"react", "react.js", "reactjs"},
+    "regression testing": {"regression testing"},
+    "responsive design": {"responsive design"},
+    "rest api": {"rest api", "restful api", "apis"},
+    "risk assessment": {"risk assessment"},
+    "scikit-learn": {"scikit-learn", "scikit learn", "sklearn", "sci-kit learn"},
+    "selenium": {"selenium"},
+    "security monitoring": {"security monitoring"},
+    "software architecture": {"software architecture", "software architectures"},
+    "spark": {"spark", "apache spark"},
+    "sql": {"sql", "postgres", "postgresql", "mysql", "sqlite"},
+    "state management": {"state management", "redux", "zustand"},
+    "statistics": {"statistics", "statistical analysis", "stats"},
+    "swift": {"swift"},
+    "system design": {"system design", "systems design"},
+    "tensorflow": {"tensorflow", "tensor flow"},
+    "test automation": {"test automation", "automated testing"},
+    "test planning": {"test planning", "test plans"},
+    "testing": {"testing", "unit testing", "pytest", "jest", "tests"},
+    "threat modeling": {"threat modeling", "threat modelling"},
+    "ui design": {"ui design", "user interface design"},
+    "vulnerability assessment": {"vulnerability assessment", "vulnerability scanning"},
+    "web performance": {"web performance", "frontend performance"},
+    "web3": {"web3", "web 3"},
+    "typescript": {"ts", "typescript"},
+    "ci/cd": {"ci/cd", "cicd", "ci cd", "continuous integration", "continuous deployment"},
+    "kubernetes": {"kubernetes", "k8s"},
+    "infrastructure as code": {"infrastructure as code", "iac"},
+    "aws": {"aws", "amazon web services"},
+    "gcp": {"gcp", "google cloud", "google cloud platform"},
+    "identity and access management": {"identity and access management", "iam"},
+    "siem": {"siem", "security information and event management"},
+    "penetration testing": {"penetration testing", "pentesting", "pen testing"},
+    "data pipelines": {"data pipeline", "data pipelines"},
+    "data warehousing": {"data warehouse", "data warehousing"},
+    "react native": {"react native", "react-native"},
+    "app store deployment": {"app store deployment", "play store deployment"},
     "git": {"git", "github", "gitlab"},
 }
+
+
+MIN_SINGLE_TOKEN_TFIDF_SCORE = 0.24
 
 
 def extract_skills(processed_text: str, raw_text: str = "") -> list[dict]:
@@ -45,7 +133,11 @@ def extract_skills(processed_text: str, raw_text: str = "") -> list[dict]:
         if skill in results:
             continue
         score = _tf_idf_like_score(skill, token_counts, ontology_skills)
-        if score >= 0.18:
+        if len(_tokens(skill)) != 1:
+            continue
+
+        threshold = MIN_SINGLE_TOKEN_TFIDF_SCORE
+        if score >= threshold:
             results[skill] = {
                 "skill": skill,
                 "source": "tf-idf",
@@ -56,7 +148,7 @@ def extract_skills(processed_text: str, raw_text: str = "") -> list[dict]:
         if skill in results:
             continue
         semantic_score = _semantic_overlap(skill, tokens)
-        if semantic_score >= 0.72:
+        if semantic_score >= 1.0:
             results[skill] = {
                 "skill": skill,
                 "source": "semantic",
@@ -78,7 +170,7 @@ def _tokens(text: str) -> list[str]:
 
 def _contains_phrase(text: str, phrase: str) -> bool:
     escaped = re.escape(phrase.lower())
-    return re.search(rf"(?<![a-z0-9+#.]){escaped}(?![a-z0-9+#.])", text) is not None
+    return re.search(rf"(?<![a-z0-9+#-]){escaped}(?![a-z0-9+#-])", text) is not None
 
 
 def _tf_idf_like_score(skill: str, token_counts: Counter, all_skills: list[str]) -> float:

@@ -13,11 +13,15 @@ def build_resume_report(file_path, selected_role: str | None = None) -> dict:
     predicted_role = predict_job_role(preprocessing.processed_text)
     target_role = _resolve_target_role(selected_role, predicted_role)
     extracted_skills = extract_skills(preprocessing.processed_text, raw_text)
-    gap_analysis = detect_skill_gaps(extracted_skills, target_role)
+    gap_analysis = detect_skill_gaps(extracted_skills, target_role, raw_text)
+    raw_text_preview = preview_text(raw_text, 900)
     recommendations = generate_recommendations(
         gap_analysis["target_role"],
         gap_analysis["missing_skills"],
         gap_analysis["matched_skills"],
+        predicted_role=predicted_role,
+        gap_analysis=gap_analysis,
+        resume_preview=raw_text_preview,
     )
 
     return {
@@ -32,7 +36,7 @@ def build_resume_report(file_path, selected_role: str | None = None) -> dict:
             "tokens": preprocessing.tokens,
             "stats": preprocessing.stats,
         },
-        "raw_text_preview": preview_text(raw_text, 900),
+        "raw_text_preview": raw_text_preview,
     }
 
 

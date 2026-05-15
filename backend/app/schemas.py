@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SkillMatch(BaseModel):
@@ -13,6 +13,7 @@ class GapAnalysis(BaseModel):
     matched_skills: list[str]
     missing_skills: list[str]
     coverage_percent: float
+    match_evidence: list[dict] = Field(default_factory=list)
 
 
 class RecommendationItem(BaseModel):

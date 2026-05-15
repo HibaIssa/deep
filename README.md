@@ -7,14 +7,14 @@ This project follows the resume analysis pipeline:
 3. A role classification model predicts a job role.
 4. Skills are extracted from the resume.
 5. Missing skills are detected using a role skill ontology.
-6. An LLM generates personalized recommendations.
+6. A recommendation layer generates personalized advice from the predicted role and skill gaps.
 7. A final report combines role prediction, skill gaps, and advice.
 
-The first implemented milestone is resume upload and preprocessing.
+The backend now supports the full resume analysis flow, including local model inference.
 
 ## Current status
 
-Everything outside the classifier model is implemented:
+Implemented pieces:
 
 - Resume upload and file validation
 - PDF, DOCX, and TXT text extraction
@@ -23,8 +23,12 @@ Everything outside the classifier model is implemented:
 - Skill gap detection against a role skill ontology
 - Recommendation generation for missing skills and resume improvements
 - React frontend for upload, target role selection, and final report display
+- DistilBERT resume job-category classification from `backend/app/model`
+- Evaluation scripts for per-class classifier F1 and human review of recommendation quality
 
-The model is intentionally left as a placeholder in `backend/app/services/classification.py` because the model work is owned separately.
+The LLM recommendation layer uses Google Gemini when `GEMINI_API_KEY` is present, with a deterministic local fallback in `backend/app/services/llm_recommendation.py`. The LLM prompt and evaluation approach are documented in `documentation/model_handoff.md`.
+
+Evaluation details and commands are documented in `documentation/evaluation.md`.
 
 ## Run
 

@@ -2,14 +2,15 @@ import { FileCheck2, FileText, Loader2, Sparkles, UploadCloud } from "lucide-rea
 import { useEffect, useMemo, useState } from "react";
 
 import FinalReport from "./FinalReport.jsx";
-import { fetchRoles, generateReport } from "../services/api.js";
+import { DEFAULT_ROLES, fetchRoles, generateReport } from "../services/api.js";
 
 export default function UploadResume() {
   const [file, setFile] = useState(null);
-  const [roles, setRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState("");
+  const [roles, setRoles] = useState(DEFAULT_ROLES);
+  const [selectedRole, setSelectedRole] = useState(DEFAULT_ROLES[0]);
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
 
   const tokenPreview = useMemo(() => {
@@ -28,9 +29,16 @@ export default function UploadResume() {
           return;
         }
         setRoles(loadedRoles);
-        setSelectedRole(loadedRoles[0] || "");
+        setSelectedRole((currentRole) => (
+          loadedRoles.includes(currentRole) ? currentRole : loadedRoles[0] || DEFAULT_ROLES[0]
+        ));
       })
-      .catch((roleError) => setError(roleError.message));
+      .catch((roleError) => setError(roleError.message))
+      .finally(() => {
+        if (!ignore) {
+          setIsLoadingRoles(false);
+        }
+      });
 
     return () => {
       ignore = true;
@@ -84,7 +92,12 @@ export default function UploadResume() {
 
         <label className="field">
           <span>Target role</span>
-          <select value={selectedRole} onChange={(event) => setSelectedRole(event.target.value)}>
+          <select
+            value={selectedRole}
+            onChange={(event) => setSelectedRole(event.target.value)}
+            disabled={isLoadingRoles && roles.length === 0}
+          >
+            {isLoadingRoles && roles.length === 0 && <option value="">Loading roles...</option>}
             {roles.map((role) => (
               <option key={role} value={role}>
                 {role}
