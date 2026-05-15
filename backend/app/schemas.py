@@ -18,6 +18,7 @@ class GapAnalysis(BaseModel):
     priority_gaps: list[dict] = Field(default_factory=list)
     readiness_level: str = "early"
     waived_skills: list[dict] = Field(default_factory=list)
+    llm_refinement: dict = Field(default_factory=dict)
 
 
 class RecommendationItem(BaseModel):

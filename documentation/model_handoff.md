@@ -33,7 +33,8 @@ The recommendation layer is designed for an API-based instruction-following LLM 
 
 - Primary option: Google Gemini through the Gemini REST `generateContent` API, configured with `GEMINI_API_KEY`.
 - Default model: `gemini-2.5-flash`, overridable with `GEMINI_MODEL`.
-- Local/offline fallback: the current deterministic implementation in `backend/app/services/llm_recommendation.py`, which uses the same role, matched-skill, and missing-skill inputs to produce template-based recommendations.
+- Gap refinement: `backend/app/services/llm_gap_refinement.py` can call Gemini after deterministic gap detection to refine priority ordering, add reasons, and produce concise insights without changing the trusted deterministic matched/missing skill sets.
+- Local/offline fallback: the deterministic implementations in `backend/app/services/gap_detection.py` and `backend/app/services/llm_recommendation.py`, which keep the pipeline usable without network credentials.
 
 This keeps the app easy to demo without network credentials while leaving a clear boundary for adding real LLM calls later.
 
@@ -49,6 +50,7 @@ The LLM prompt should be built from structured pipeline output, not raw resume t
 - Priority gaps, including whether each gap is fully missing or partially supported by transferable evidence.
 - Match evidence and partial-match evidence when useful for grounding recommendations.
 - Skills waived because an equivalent alternative stack is covered.
+- Optional validated LLM gap-refinement insights.
 - A short resume preview only if needed for personalization.
 
 The system instruction should constrain the model to act as a career-advice assistant and return concise, evidence-based suggestions. The user payload should be JSON-like structured data, for example:

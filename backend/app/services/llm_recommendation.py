@@ -44,9 +44,15 @@ def _generate_with_gemini(
         "predicted_role": predicted_role,
         "target_role": role,
         "coverage_percent": gap_analysis.get("coverage_percent"),
+        "readiness_level": gap_analysis.get("readiness_level"),
         "matched_skills": matched_skills,
         "missing_skills": missing_skills,
         "required_skills": gap_analysis.get("required_skills", []),
+        "priority_gaps": gap_analysis.get("priority_gaps", []),
+        "partial_matches": gap_analysis.get("partial_matches", []),
+        "match_evidence": gap_analysis.get("match_evidence", []),
+        "waived_skills": gap_analysis.get("waived_skills", []),
+        "llm_gap_insights": gap_analysis.get("llm_refinement", {}).get("insights", []),
         "resume_preview": resume_preview[:900],
     }
     payload = {
@@ -70,7 +76,9 @@ def _generate_with_gemini(
                         "text": (
                             "Create 3 to 5 recommendation items for this resume analysis. "
                             "Each item must include title, detail, and priority. Priority must be "
-                            "High, Medium, or Low.\n\n"
+                            "High, Medium, or Low. Address high-priority and partial gaps before "
+                            "low-priority gaps, and use match evidence to avoid recommending skills "
+                            "that are already covered or waived by alternatives.\n\n"
                             f"{json.dumps(prompt_data, ensure_ascii=False)}"
                         )
                     }

@@ -49,6 +49,7 @@ Response sections:
 - `partial_matches`: transferable evidence that partially supports a missing skill
 - `priority_gaps`: missing or partial gaps with `High`, `Medium`, or `Low` priority
 - `waived_skills`: skills not counted as gaps because an equivalent alternative is covered
+- `llm_refinement`: optional Gemini gap-review metadata with model name and validated insight items
 
 Example:
 
@@ -80,9 +81,21 @@ Example:
     {
       "skill": "debugging",
       "priority": "Medium",
-      "status": "partial"
+      "status": "partial",
+      "reason": "Testing and Postman evidence partially support debugging, but the resume should show direct defect-resolution examples."
     }
   ],
-  "waived_skills": []
+  "waived_skills": [],
+  "llm_refinement": {
+    "enabled": true,
+    "model": "gemini-2.5-flash",
+    "insights": [
+      {
+        "title": "Show direct debugging evidence",
+        "detail": "The resume has related testing evidence, but stronger debugging bullets would improve role alignment.",
+        "priority": "Medium"
+      }
+    ]
+  }
 }
 ```

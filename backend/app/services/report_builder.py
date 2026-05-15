@@ -1,5 +1,6 @@
 from app.services.classification import predict_job_role
 from app.services.gap_detection import detect_skill_gaps, get_available_roles
+from app.services.llm_gap_refinement import refine_gap_analysis_with_llm
 from app.services.llm_recommendation import generate_recommendations
 from app.services.preprocessing import preprocess_resume_text
 from app.services.resume_parser import extract_resume_text
@@ -15,6 +16,12 @@ def build_resume_report(file_path, selected_role: str | None = None) -> dict:
     extracted_skills = extract_skills(preprocessing.processed_text, raw_text)
     gap_analysis = detect_skill_gaps(extracted_skills, target_role, raw_text)
     raw_text_preview = preview_text(raw_text, 900)
+    gap_analysis = refine_gap_analysis_with_llm(
+        gap_analysis,
+        extracted_skills,
+        predicted_role=predicted_role,
+        resume_preview=raw_text_preview,
+    )
     recommendations = generate_recommendations(
         gap_analysis["target_role"],
         gap_analysis["missing_skills"],

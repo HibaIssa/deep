@@ -42,6 +42,8 @@ This runs every step: parsing, preprocessing, model classification, skill extrac
 
 Skill gap detection is role-aware rather than a flat checklist. It uses direct matches, aliases, inferred matches, project-context evidence, alternative technology groups, partial transferable evidence, weighted coverage, readiness levels, and prioritized gaps.
 
+When `GEMINI_API_KEY` is configured, the report pipeline also asks Gemini to review the deterministic gap analysis. The LLM can refine the order of existing priority gaps, add short reasons, and return insight items, but validation prevents it from adding new matched or missing skills. If Gemini is unavailable, the deterministic gap analysis is returned unchanged.
+
 ## Model inference
 
 The classifier integration point is `app/services/classification.py`. It loads the local DistilBERT sequence-classification model from:
@@ -60,7 +62,7 @@ app/model
 }
 ```
 
-## Gemini recommendations
+## Gemini gap review and recommendations
 
 The recommendation service uses Google Gemini when `GEMINI_API_KEY` is set in the project-root `.env` file:
 
@@ -69,7 +71,7 @@ GEMINI_API_KEY=your_key_here
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-If the key is missing or the API call fails, the backend falls back to deterministic local recommendations.
+If the key is missing or the API call fails, the backend falls back to deterministic local gap detection and recommendations.
 
 ## Evaluation
 
