@@ -1,0 +1,32 @@
+from pydantic import BaseModel
+
+
+class SkillMatch(BaseModel):
+    skill: str
+    source: str
+    score: float
+
+
+class GapAnalysis(BaseModel):
+    target_role: str
+    required_skills: list[str]
+    matched_skills: list[str]
+    missing_skills: list[str]
+    coverage_percent: float
+
+
+class RecommendationItem(BaseModel):
+    title: str
+    detail: str
+    priority: str
+
+
+class ResumeReport(BaseModel):
+    filename: str
+    predicted_role: dict
+    selected_role: str
+    extracted_skills: list[SkillMatch]
+    gap_analysis: GapAnalysis
+    recommendations: list[RecommendationItem]
+    preprocessing: dict
+    raw_text_preview: str
