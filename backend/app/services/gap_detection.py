@@ -37,10 +37,16 @@ ROLE_ALTERNATIVE_GROUPS = {
         {"model deployment", "mlops"},
     ],
     "Data Engineer": [
-        {"spark", "airflow", "kafka"},
+        {"cloud", "aws", "azure", "gcp"},
     ],
     "Mobile Developer": [
         {"android", "ios", "react native", "flutter", "swift", "kotlin"},
+    ],
+    "Cybersecurity Engineer": [
+        {"siem", "security monitoring"},
+    ],
+    "Blockchain Developer": [
+        {"ethereum", "web3"},
     ],
 }
 
@@ -58,6 +64,20 @@ INFERRED_SKILL_RULES = {
     "data pipelines": {"etl", "airflow", "spark", "kafka"},
     "data warehousing": {"etl", "data modeling", "big data"},
     "application security": {"penetration testing", "vulnerability assessment", "security auditing"},
+    "database design": {"data modeling"},
+    "query optimization": {"indexing", "stored procedures"},
+    "database security": {"identity and access management", "application security", "security auditing"},
+    "quality assurance": {"testing", "test automation", "manual testing", "regression testing"},
+    "regression testing": {"testing", "test automation", "quality assurance"},
+    "risk assessment": {"threat modeling", "vulnerability assessment", "security auditing"},
+    "security monitoring": {"siem", "monitoring"},
+    "identity and access management": {"authentication", "oauth", "iam"},
+    "blockchain": {"ethereum", "web3", "smart contracts", "solidity"},
+    "smart contracts": {"solidity"},
+    "decentralized applications": {"blockchain", "web3", "ethereum", "smart contracts"},
+    "security auditing": {"application security", "vulnerability assessment", "penetration testing"},
+    "mobile testing": {"testing", "test automation"},
+    "performance optimization": {"web performance", "monitoring", "performance"},
     "software architecture": {"system design"},
 }
 
@@ -111,6 +131,43 @@ ROLE_IMPORTANCE = {
         "important": {"mobile testing", "backend integration", "performance optimization", "offline storage"},
         "supporting": {"app store deployment"},
     },
+    "Database Engineer": {
+        "core": {"sql", "databases", "postgresql", "mysql", "database design", "query optimization"},
+        "important": {"indexing", "stored procedures", "etl", "data modeling", "backup and recovery"},
+        "supporting": {"database security"},
+    },
+    "DevOps/Cloud Engineer": {
+        "core": {"linux", "docker", "kubernetes", "ci/cd", "terraform", "cloud"},
+        "important": {"aws", "azure", "gcp", "monitoring", "infrastructure as code", "scripting"},
+        "supporting": set(),
+    },
+    "QA Engineer": {
+        "core": {"testing", "test automation", "manual testing", "selenium", "cypress", "quality assurance"},
+        "important": {"pytest", "jest", "test planning", "regression testing", "api testing", "bug tracking"},
+        "supporting": set(),
+    },
+    "Data Engineer": {
+        "core": {"python", "sql", "etl", "data pipelines", "airflow", "spark", "databases"},
+        "important": {"kafka", "data warehousing", "data modeling", "big data", "cloud"},
+        "supporting": set(),
+    },
+    "Cybersecurity Engineer": {
+        "core": {
+            "network security",
+            "application security",
+            "vulnerability assessment",
+            "penetration testing",
+            "incident response",
+            "linux",
+        },
+        "important": {"siem", "threat modeling", "identity and access management", "security monitoring", "risk assessment"},
+        "supporting": {"cryptography"},
+    },
+    "Blockchain Developer": {
+        "core": {"blockchain", "solidity", "smart contracts", "ethereum", "web3", "javascript", "testing"},
+        "important": {"cryptography", "decentralized applications", "token standards", "security auditing", "node.js"},
+        "supporting": set(),
+    },
 }
 
 
@@ -133,6 +190,34 @@ PARTIAL_SKILL_RULES = {
     "mobile testing": {"testing", "test automation"},
     "app store deployment": {"mobile app", "deployment"},
     "offline storage": {"session management", "local storage", "mobile app"},
+    "database design": {"sql", "databases", "data modeling"},
+    "query optimization": {"indexing", "stored procedures", "sql"},
+    "stored procedures": {"sql", "databases"},
+    "backup and recovery": {"databases", "database security"},
+    "database security": {"application security", "identity and access management", "security auditing"},
+    "test automation": {"pytest", "jest", "selenium", "cypress", "testing"},
+    "test planning": {"quality assurance", "manual testing", "regression testing"},
+    "regression testing": {"testing", "quality assurance", "test automation"},
+    "bug tracking": {"debugging", "quality assurance"},
+    "quality assurance": {"testing", "manual testing", "test automation"},
+    "airflow": {"etl", "data pipelines"},
+    "spark": {"big data", "data pipelines"},
+    "kafka": {"data pipelines", "big data"},
+    "data modeling": {"databases", "sql", "data warehousing"},
+    "big data": {"spark", "kafka", "data pipelines"},
+    "network security": {"linux", "security monitoring"},
+    "incident response": {"security monitoring", "siem", "risk assessment"},
+    "threat modeling": {"application security", "risk assessment"},
+    "identity and access management": {"authentication", "application security"},
+    "cryptography": {"blockchain", "application security"},
+    "solidity": {"smart contracts", "ethereum", "blockchain"},
+    "ethereum": {"blockchain", "web3", "smart contracts"},
+    "web3": {"blockchain", "ethereum", "decentralized applications"},
+    "decentralized applications": {"blockchain", "web3", "smart contracts"},
+    "token standards": {"smart contracts", "ethereum", "solidity"},
+    "security auditing": {"application security", "vulnerability assessment", "penetration testing"},
+    "mobile ui": {"react native", "flutter", "mobile app", "ui design"},
+    "performance optimization": {"performance", "web performance", "monitoring"},
 }
 
 
@@ -150,6 +235,7 @@ def detect_skill_gaps(
     detected_names = _detected_skill_names(extracted_skills) | _resume_signal_names(resume_text)
     _add_detected_required_evidence(required_skills, match_evidence, detected_names)
     _add_inferred_match_evidence(required_skills, match_evidence, detected_names)
+    _add_frontend_foundation_evidence(required_skills, match_evidence, detected_names, resume_text)
     matched_skills = [skill for skill in required_skills if skill.lower() in match_evidence]
 
     matched_names = {skill.lower() for skill in matched_skills}
@@ -356,6 +442,15 @@ def _resume_signal_names(resume_text: str) -> set[str]:
         signals.add("frontend")
 
     if (
+        _contains_phrase(searchable_text, "front-end")
+        or _contains_phrase(searchable_text, "front end")
+        or _contains_phrase(searchable_text, "web app")
+        or _contains_phrase(searchable_text, "web application")
+        or _contains_phrase(searchable_text, "website")
+    ):
+        signals.add("frontend")
+
+    if (
         _contains_phrase(searchable_text, "mobile app")
         or _contains_phrase(searchable_text, "mobile applications")
         or _contains_phrase(searchable_text, "react native")
@@ -488,6 +583,31 @@ def _add_inferred_match_evidence(
             "matched_alias": ", ".join(matched_support),
         }
         available_names.add(skill_key)
+
+
+def _add_frontend_foundation_evidence(
+    required_skills: list[str],
+    evidence: dict[str, dict],
+    detected_names: set[str],
+    resume_text: str,
+) -> None:
+    required_lookup = {skill.lower(): skill for skill in required_skills}
+    if "html" not in required_lookup or "html" in evidence:
+        return
+
+    available_names = set(evidence.keys()) | detected_names
+    frontend_context = "frontend" in available_names
+    frontend_stack = {"css", "javascript", "typescript", "react"} & available_names
+    strong_frontend_stack = {"css", "javascript"} <= available_names or "react" in available_names
+    if not frontend_stack or not (frontend_context or strong_frontend_stack):
+        return
+
+    evidence["html"] = {
+        "skill": required_lookup["html"],
+        "source": "inferred",
+        "score": 0.85,
+        "matched_alias": ", ".join(sorted(frontend_stack)),
+    }
 
 
 def _alternative_covered_skills(

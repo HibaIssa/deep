@@ -125,6 +125,74 @@ class SkillGapDetectionTests(unittest.TestCase):
 
         self.assertNotIn("azure", gap["missing_skills"])
 
+    def test_database_engineer_accepts_sql_engine_alternatives_but_keeps_specific_gaps(self):
+        gap = self._gap_for(
+            (
+                "Built PostgreSQL databases with SQL schema design, indexing, stored procedures, "
+                "ETL jobs, data modeling, and database backup recovery."
+            ),
+            "Database Engineer",
+        )
+
+        for skill in ["sql", "postgresql", "databases", "database design", "indexing", "stored procedures"]:
+            self.assertIn(skill, gap["matched_skills"])
+
+        self.assertNotIn("mysql", gap["missing_skills"])
+        self.assertIn("database security", gap["missing_skills"])
+
+    def test_data_engineering_tools_are_not_all_interchangeable(self):
+        gap = self._gap_for(
+            "Built Python SQL ETL data pipelines with Airflow orchestration, databases, and cloud storage.",
+            "Data Engineer",
+        )
+
+        for skill in ["python", "sql", "etl", "data pipelines", "airflow", "databases", "cloud"]:
+            self.assertIn(skill, gap["matched_skills"])
+
+        self.assertIn("spark", gap["missing_skills"])
+        self.assertIn("kafka", gap["missing_skills"])
+
+    def test_cybersecurity_accepts_monitoring_equivalence_but_keeps_pen_testing_gap(self):
+        gap = self._gap_for(
+            (
+                "Handled Linux network security, SIEM monitoring, vulnerability assessment, "
+                "threat modeling, IAM, incident response, and encryption."
+            ),
+            "Cybersecurity Engineer",
+        )
+
+        for skill in ["linux", "network security", "siem", "vulnerability assessment", "incident response"]:
+            self.assertIn(skill, gap["matched_skills"])
+
+        self.assertNotIn("security monitoring", gap["missing_skills"])
+        self.assertIn("penetration testing", gap["missing_skills"])
+
+    def test_blockchain_solidity_infers_smart_contracts_but_not_security_auditing(self):
+        gap = self._gap_for(
+            "Built Ethereum Web3 dApps using Solidity, JavaScript, Node.js, tests, and encryption.",
+            "Blockchain Developer",
+        )
+
+        for skill in ["blockchain", "solidity", "smart contracts", "ethereum", "web3", "javascript", "testing"]:
+            self.assertIn(skill, gap["matched_skills"])
+
+        self.assertIn("security auditing", gap["missing_skills"])
+
+    def test_frontend_stack_infers_html_foundation(self):
+        gap = self._gap_for(
+            (
+                "Built a frontend React project using CSS, JavaScript, TypeScript, "
+                "REST API integration, and Jest testing."
+            ),
+            "Frontend Developer",
+        )
+
+        self.assertIn("html", gap["matched_skills"])
+        self.assertNotIn("html", gap["missing_skills"])
+        evidence_by_skill = {item["skill"]: item for item in gap["match_evidence"]}
+        self.assertEqual(evidence_by_skill["html"]["source"], "inferred")
+        self.assertIn("react", evidence_by_skill["html"]["matched_alias"])
+
     def test_software_engineer_resume_uses_project_and_coursework_context(self):
         resume_text = (
             "Software Engineer and AI full-stack developer. Built mobile applications using React Native "
